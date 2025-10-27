@@ -1,0 +1,282 @@
+// ============================================
+// CodeFolio API - Database Schema
+// ============================================
+// Date: 27/10/2025
+// Description: Database schema for the GraphQL Portfolio Management API
+// Database: MongoDB with Mongoose ODM
+
+Project CodeFolio {
+  database_type: 'MongoDB'
+  Note: '''
+    GraphQL API for managing a personal portfolio
+    - JWT authentication
+    - RBAC (Admin/Visitor)
+    - Full CRUD for projects, skills, and experiences
+  '''
+}
+
+// ============================================
+// TABLE: USERS
+// ============================================
+Table users {
+  _id ObjectId [pk, unique, note: 'MongoDB ObjectId']
+  username varchar [not null, unique, note: 'Unique username']
+  email varchar [not null, unique, note: 'Unique email']
+  password varchar [not null, note: 'Password hashed with bcrypt (10 rounds)']
+  role varchar [not null, default: 'visitor', note: "Enum: 'admin', 'visitor'"]
+  refreshToken text [note: 'JWT refresh token for renewal']
+  refreshTokenExpiry datetime [note: 'Refresh token expiration date']
+  createdAt datetime [not null, default: `now()`]
+  updatedAt datetime [not null, default: `now()`]
+  
+  indexes {
+    (username, email) [unique, name: 'unique_user_credentials']
+    role [name: 'idx_user_role']
+  }
+  
+  Note: '''
+    Users collection - Handles authentication and roles
+    - Admin: full access (queries + mutations)
+    - Visitor: read-only access (queries only)
+  '''
+}
+
+// ============================================
+// TABLE: PROFILE
+// ============================================
+Table profile {
+  _id ObjectId [pk, unique, note: 'MongoDB ObjectId']
+  createdBy_id ObjectId [not null, note: 'Reference to users._id (admin)']
+  updatedBy_id ObjectId [note: 'Last modified by (admin)']
+  lastName varchar [not null, note: 'Last name']
+  firstName varchar [not null, note: 'First name']
+  title varchar [not null, note: 'Professional title (e.g. Full Stack Developer)']
+  biography text [not null, note: 'Full biography in markdown']
+  email varchar [not null, note: 'Public contact email']
+  phone varchar [note: 'Phone number (optional)']
+  address varchar [note: 'Full address (optional)']
+  photo varchar [note: 'Profile photo URL (CDN/S3)']
+  github varchar [note: 'Full GitHub profile URL']
+  linkedin varchar [note: 'Full LinkedIn profile URL']
+  twitter varchar [note: 'Full Twitter/X profile URL']
+  website varchar [note: 'Personal website URL']
+  cv varchar [note: 'CV URL (PDF)']
+  createdAt datetime [not null, default: `now()`]
+  updatedAt datetime [not null, default: `now()`]
+  
+  Note: '''
+    Profile table - Singleton pattern (only one entry)
+    Contains all personal information for the portfolio
+  '''
+}
+
+// ============================================
+// TABLE: PROJECTS
+// ============================================
+Table projects {
+  _id ObjectId [pk, unique, note: 'MongoDB ObjectId']
+  createdBy_id ObjectId [not null, note: 'Reference to users._id (admin)']
+  updatedBy_id ObjectId [note: 'Last modified by (admin)']
+  title varchar [not null, note: 'Project title']
+  description text [not null, note: 'Detailed markdown description']
+  technologies text [note: 'JSON array of technologies: ["React", "Node.js"]']
+  projectUrl varchar [note: 'Production/demo project URL']
+  githubUrl varchar [note: 'GitHub repository URL']
+  images text [note: 'JSON array of screenshot URLs']
+  startDate date [not null, note: 'Project start date']
+  endDate date [note: 'End date (null if ongoing)']
+  status varchar [not null, default: 'in_progress', note: "Enum: 'in_progress', 'completed', 'archived'"]
+  order int [note: 'Manual display order']
+  featured boolean [default: false, note: 'Highlighted project']
+  createdAt datetime [not null, default: `now()`]
+  updatedAt datetime [not null, default: `now()`]
+  
+  indexes {
+    status [name: 'idx_project_status']
+    startDate [name: 'idx_project_date']
+    (featured, order) [name: 'idx_project_display']
+  }
+  
+  Note: '''
+    Projects table - Portfolio of work
+    Supports markdown for the project description
+  '''
+}
+
+// ============================================
+// TABLE: SKILLS
+// ============================================
+Table skills {
+  _id ObjectId [pk, unique, note: 'MongoDB ObjectId']
+  createdBy_id ObjectId [not null, note: 'Reference to users._id (admin)']
+  updatedBy_id ObjectId [note: 'Last modified by (admin)']
+  name varchar [not null, note: 'Skill name (e.g. React, Node.js, Docker)']
+  category varchar [not null, note: "Enum: 'frontend', 'backend', 'database', 'devops', 'other'"]
+  level int [not null, note: 'Proficiency level: 1=Beginner, 5=Expert']
+  icon varchar [note: 'URL or icon slug (e.g. react, nodejs)']
+  description text [note: 'Optional description of expertise']
+  order int [note: 'Display order within category']
+  createdAt datetime [not null, default: `now()`]
+  updatedAt datetime [not null, default: `now()`]
+  
+  indexes {
+    category [name: 'idx_skill_category']
+    (category, level) [name: 'idx_skill_display']
+    order [name: 'idx_skill_order']
+  }
+  
+  Note: '''
+    Skills table - Technical skills
+    Organized by category with a 1-5 rating system
+  '''
+}
+
+// ============================================
+// TABLE: EXPERIENCES
+// ============================================
+Table experiences {
+  _id ObjectId [pk, unique, note: 'MongoDB ObjectId']
+  createdBy_id ObjectId [not null, note: 'Reference to users._id (admin)']
+  updatedBy_id ObjectId [note: 'Last modified by (admin)']
+  position varchar [not null, note: 'Job title']
+  company varchar [not null, note: 'Company/organization name']
+  location varchar [note: 'City, country']
+  description text [not null, note: 'Detailed markdown description of responsibilities']
+  startDate date [not null, note: 'Experience start date']
+  endDate date [note: 'End date (null if current)']
+  current boolean [not null, default: false, note: 'Currently active experience']
+  technologies text [note: 'JSON array of used technologies']
+  achievements text [note: 'JSON array of key achievements']
+  logo varchar [note: 'Company logo URL']
+  createdAt datetime [not null, default: `now()`]
+  updatedAt datetime [not null, default: `now()`]
+  
+  indexes {
+    startDate [name: 'idx_experience_date']
+    current [name: 'idx_experience_current']
+    (current, startDate) [name: 'idx_experience_display']
+  }
+  
+  Note: '''
+    Experiences table - Professional background
+    Sorted by descending date (most recent first)
+  '''
+}
+
+// ============================================
+// TABLE: PROJECT_SKILLS (Junction Table)
+// ============================================
+Table project_skills {
+  _id ObjectId [pk, unique, note: 'MongoDB ObjectId']
+  project_id ObjectId [not null, note: 'Reference to projects._id']
+  skill_id ObjectId [not null, note: 'Reference to skills._id']
+  usage_level int [note: 'Usage level in this project (1-5)']
+  createdAt datetime [not null, default: `now()`]
+  
+  indexes {
+    (project_id, skill_id) [unique, name: 'unique_project_skill']
+    project_id [name: 'idx_ps_project']
+    skill_id [name: 'idx_ps_skill']
+  }
+  
+  Note: '''
+    Many-to-Many relation between Projects and Skills
+    Links the skills used in each project
+  '''
+}
+
+// ============================================
+// RELATIONS
+// ============================================
+
+// User -> Profile (One-to-One)
+Ref: users._id < profile.createdBy_id // Admin who created the profile
+// Admin who last updated the profile
+Ref: users._id < profile.updatedBy_id
+
+// User -> Projects (One-to-Many)
+// Admin who created the project
+Ref: users._id < projects.createdBy_id
+// Admin who last updated the project
+Ref: users._id < projects.updatedBy_id
+
+// User -> Skills (One-to-Many)
+// Admin who created the skill
+Ref: users._id < skills.createdBy_id
+// Admin who last updated the skill
+Ref: users._id < skills.updatedBy_id
+
+// User -> Experiences (One-to-Many)
+// Admin who created the experience
+Ref: users._id < experiences.createdBy_id
+// Admin who last updated the experience
+Ref: users._id < experiences.updatedBy_id
+
+// Projects <-> Skills (Many-to-Many via Junction Table)
+// Linked project
+Ref: projects._id < project_skills.project_id
+// Skill used
+Ref: skills._id < project_skills.skill_id
+
+// ============================================
+// ENUMS
+// ============================================
+
+Enum role_enum {
+  admin [note: 'Full access: Queries + Mutations (CRUD)']
+  visitor [note: 'Read-only access: Queries only']
+}
+
+Enum project_status_enum {
+  in_progress [note: 'Project currently in development']
+  completed [note: 'Project completed and deployed']
+  archived [note: 'Archived project (no longer maintained)']
+}
+
+Enum skill_category_enum {
+  frontend [note: 'Front-end technologies (React, Vue, Angular)']
+  backend [note: 'Back-end technologies (Node.js, Python, Java)']
+  database [note: 'Databases (MongoDB, PostgreSQL, Redis)']
+  devops [note: 'DevOps and infrastructure (Docker, K8s, CI/CD)']
+  other [note: 'Other skills (Design, Testing, etc.)']
+}
+
+// ============================================
+// INDEXES & PERFORMANCE NOTES
+// ============================================
+
+// Suggested composite indexes for MongoDB:
+// db.users.createIndex({ username: 1, email: 1 }, { unique: true })
+// db.projects.createIndex({ status: 1, featured: -1, order: 1 })
+// db.projects.createIndex({ startDate: -1 })
+// db.skills.createIndex({ category: 1, level: -1, order: 1 })
+// db.experiences.createIndex({ current: 1, startDate: -1 })
+// db.project_skills.createIndex({ project_id: 1, skill_id: 1 }, { unique: true })
+
+// ============================================
+// BUSINESS RULES & CONSTRAINTS
+// ============================================
+
+// 1. Only one profile exists in the database (singleton pattern)
+// 2. Only users with role='admin' can create/update/delete
+// 3. Passwords are always hashed with bcrypt (min 10 rounds)
+// 4. End dates may be null if the record is ongoing
+// 5. Technologies and images are stored as JSON arrays
+// 6. All ObjectIds follow MongoDB standard format
+// 7. Timestamps (createdAt, updatedAt) are automatically managed by Mongoose
+// 8. JWT tokens expire after 7 days by default (configurable)
+// 9. Refresh tokens allow silent renewal
+// 10. Strict validation of emails and usernames (unique)
+
+// ============================================
+// SECURITY NOTES
+// ============================================
+
+// - Passwords: bcrypt with salt rounds = 10
+// - JWT: HS256 algorithm, secret stored in environment variable
+// - Rate limiting: 100 requests/15min for mutations
+// - CORS: domain whitelist configured
+// - Input validation: all inputs are validated server-side
+// - SQL Injection: N/A (MongoDB + Mongoose ODM)
+// - XSS: HTML/Markdown input sanitization
+// - CSRF: tokens for critical mutations
