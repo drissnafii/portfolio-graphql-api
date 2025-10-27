@@ -1,0 +1,320 @@
+{
+  "projectBrief": {
+    "title": "Portfolio Backend API (Apollo Server)",
+    "context": {
+      "problem": "Un développeur a besoin d'un backend centralisé, moderne et facile à maintenir pour alimenter son site web de portfolio personnel, sans être dépendant d'un CMS monolithique.",
+      "objective": "Construire une API GraphQL robuste et sécurisée qui gère l'ensemble des données d'un portfolio : profil personnel, projets, compétences et expériences."
+    },
+    "userStories": [
+      {
+        "role": "Propriétaire",
+        "actions": [
+          "se connecter pour gérer le contenu de mon portfolio.",
+          "mettre à jour ma biographie et mes liens de réseaux sociaux.",
+          "ajouter un nouveau projet avec ses compétences."
+        ]
+      },
+      {
+        "role": "Visiteur",
+        "actions": [
+          "consulter le profil, les projets et les expériences pour avoir une vue d'ensemble complète."
+        ]
+      }
+    ],
+    "features": {
+      "apiType": "GraphQL",
+      "queries": [
+        {
+          "name": "getPortfolio",
+          "description": "Récupère le profil, les projets, les compétences et les expériences en un seul appel.",
+          "access": "Publique"
+        },
+        {
+          "name": "getProfil",
+          "description": "Récupère uniquement les informations du profil.",
+          "access": "Publique"
+        },
+        {
+          "name": "getProjets",
+          "description": "Récupère la liste des projets.",  
+          "access": "Publique"
+        },
+        {
+          "name": "getCompetences",
+          "description": "Récupère la liste des compétences.",
+          "access": "Publique"
+        },
+        {
+          "name": "getExperiences",
+          "description": "Récupère la liste des expériences.",
+          "access": "Publique"
+        }
+      ],
+      "mutations": [
+        {
+          "name": "login(username, password)",
+          "description": "Authentifie l'admin et retourne un jeton JWT.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "updateProfil",
+          "description": "Met à jour les informations du profil.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "createProjet",
+          "description": "Crée un nouveau projet.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "updateProjet",
+          "description": "Met à jour un projet existant.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "deleteProjet",
+          "description": "Supprime un projet.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "createCompetence",
+          "description": "Crée une nouvelle compétence.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "updateCompetence",
+          "description": "Met à jour une compétence.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "deleteCompetence",
+          "description": "Supprime une compétence.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "createExperience",
+          "description": "Crée une nouvelle expérience.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "updateExperience",
+          "description": "Met à jour une expérience.",
+          "access": "Protégée (Admin)"
+        },
+        {
+          "name": "deleteExperience",
+          "description": "Supprime une expérience.",
+          "access": "Protégée (Admin)"
+        }
+      ]
+    },
+    "security": {
+      "strategy": "RBAC (Role-Based Access Control)",
+      "roles": [
+        {
+          "role": "Visiteur",
+          "permissions": "Accès en lecture seule (Queries).",
+          "authMethod": "Aucune"
+        },
+        {
+          "role": "Admin",
+          "permissions": "Accès complet en lecture et écriture (Queries + Mutations).",
+          "authMethod": "JWT (Authentification requise)"
+        }
+      ]
+    },
+    "techStack": {
+      "backend": "Node.js, Express.js",
+      "language": "TypeScript",
+      "api": "GraphQL (Apollo Server)",
+      "database": "MongoDB (Mongoose)",
+      "authentication": "JWT"
+    },
+    "projectManagement": {
+      "type": "Projet individuel",
+      "methodology": "Auto-gestion du temps et planification des tâches",
+      "timeline": {
+        "startDate": "2025-10-27",
+        "endDate": "2025-10-31",
+        "durationDays": 5,
+        "deadline": "Vendredi 31/10/2025 à minuit"
+      }
+    },
+    "evaluation": {
+      "totalDurationMinutes": 25,
+      "breakdown": [
+        {
+          "part": "Démo fonctionnalités",
+          "durationMinutes": 5
+        },
+        {
+          "part": "Explication du code source et architecture",
+          "durationMinutes": 10
+        },
+        {
+          "part": "Mise en situation technique",
+          "durationMinutes": 10
+        }
+      ]
+    },
+    "deliverables": [
+      "Code source (GitHub avec README détaillé)",
+      "Présentation de la conception et les fonctionnalités",
+      "Docker Compose avec services configurés",
+      "Collection Postman",
+      "Planification (Jira/Trello)"
+    ],
+    "performanceCriteria": [
+      "Structure projet modulaire (MVC/Clean Architecture)",
+      "Nommage cohérent (camelCase variables, PascalCase classes)",
+      "Code lisible respectant DRY et SRP",
+      "Validation rigoureuse des entrées",
+      "Gestion centralisée des erreurs",
+      "Endpoints testés et documentés",
+      "Utilisation de TypeScript pour typage strict",
+      "Sécurité renforcée (JWT, rate limiting,...)",
+      "Tests unitaires et d'intégration couvrant > 80% du code",
+      "Utilisation de Docker/Docker compose pour environnement cohérent",
+      "Mise en place de la journalisation (winston, morgan)",
+      "CI/CD pour des pipelines automatisés (Github Actions)"
+    ]
+  },
+  "architecture": {
+    "structure": {
+      "src/": "Code source principal",
+      "src/types/": "Définitions TypeScript et schémas GraphQL",
+      "src/resolvers/": "Résolveurs GraphQL (queries et mutations)",
+      "src/models/": "Modèles Mongoose pour MongoDB",
+      "src/middleware/": "Middleware d'authentification et validation",
+      "src/utils/": "Utilitaires et helpers",
+      "src/config/": "Configuration de l'application",
+      "tests/": "Tests unitaires et d'intégration",
+      "docker/": "Configuration Docker",
+      "docs/": "Documentation du projet"
+    },
+    "dataModels": {
+      "Profil": {
+        "fields": ["nom", "prenom", "email", "telephone", "biographie", "photo", "reseauxSociaux"],
+        "description": "Informations personnelles du développeur"
+      },
+      "Projet": {
+        "fields": ["titre", "description", "technologies", "lienGit", "lienDemo", "image", "dateCreation"],
+        "description": "Projets réalisés par le développeur"
+      },
+      "Competence": {
+        "fields": ["nom", "niveau", "categorie", "description"],
+        "description": "Compétences techniques du développeur"
+      },
+      "Experience": {
+        "fields": ["poste", "entreprise", "dateDebut", "dateFin", "description", "technologies"],
+        "description": "Expériences professionnelles"
+      }
+    }
+  },
+  "codingStandards": {
+    "naming": {
+      "variables": "camelCase",
+      "classes": "PascalCase",
+      "constants": "UPPER_SNAKE_CASE",
+      "files": "kebab-case"
+    },
+    "principles": [
+      "DRY (Don't Repeat Yourself)",
+      "SRP (Single Responsibility Principle)",
+      "Clean Architecture",
+      "TypeScript strict mode"
+    ],
+    "testing": {
+      "coverage": "> 80%",
+      "frameworks": ["Jest", "Supertest"],
+      "types": ["Unit tests", "Integration tests"]
+    }
+  },
+  "developmentWorkflow": {
+    "git": {
+      "branching": "main branch with feature branches",
+      "commits": "Conventional commits format",
+      "pullRequests": "Required for all changes"
+    },
+    "docker": {
+      "services": ["app", "mongodb", "redis (optional)"],
+      "environment": "Development and production configs"
+    },
+    "ci_cd": {
+      "platform": "GitHub Actions",
+      "stages": ["lint", "test", "build", "deploy"]
+    },
+    "gitStrategy": {
+      "strategyName": "Jira-Linked Feature Branching (Solo)",
+      "description": "A simple Git flow for a solo developer, linking all branches and commits to Jira issues for automatic tracking.",
+      "permanentBranches": [
+        {
+          "name": "main",
+          "purpose": "Primary branch. Always contains stable, completed, and deployable code.",
+          "rules": [
+            "NEVER commit directly to this branch.",
+            "All code must be merged via a Pull Request (PR)."
+          ]
+        }
+      ],
+      "temporaryBranches": {
+        "type": "Feature Branch",
+        "namingConvention": "[JIRA-TICKET-ID]/[short-description]",
+        "example": "PORT-7/create-mongoose-schemas",
+        "purpose": "To isolate development for a single Jira task. The name links it directly to the ticket."
+      },
+      "workflow": [
+        {
+          "step": 1,
+          "action": "Start Task (in Jira)",
+          "details": "Move the Jira ticket (e.g., 'PORT-7') from the 'To Do' column to 'In Progress'."
+        },
+        {
+          "step": 2,
+          "action": "Sync Local 'main' (in Terminal)",
+          "commands": [
+            "git checkout main",
+            "git pull origin main"
+          ]
+        },
+        {
+          "step": 3,
+          "action": "Create Feature Branch (in Terminal)",
+          "details": "Create a new branch named after the Jira ticket.",
+          "command": "git checkout -b PORT-7/feature-name"
+        },
+        {
+          "step": 4,
+          "action": "Code & Commit (Local)",
+          "details": "Do the work. Commit changes, referencing the Jira ID in the message for linking.",
+          "command": "git commit -m \"PORT-7: Add schemas for Profil and Projet\""
+        },
+        {
+          "step": 5,
+          "action": "Push Branch (in Terminal)",
+          "details": "Push the new branch to the remote GitHub repository.",
+          "command": "git push -u origin PORT-7/feature-name"
+        },
+        {
+          "step": 6,
+          "action": "Create & Merge PR (in GitHub)",
+          "details": "Open a Pull Request on GitHub to merge your feature branch into 'main'. Review and merge it."
+        },
+        {
+          "step": 7,
+          "action": "Finish Task (in Jira)",
+          "details": "Move the Jira ticket from 'In Progress' to 'Done'. The commit and PR should be visible in the ticket."
+        },
+        {
+          "step": 8,
+          "action": "Cleanup (in Terminal)",
+          "details": "Go back to 'main' and pull the changes you just merged to keep your local 'main' up-to-date.",
+          "commands": [
+            "git checkout main",
+            "git pull origin main"
+          ]
+        }
+      ]
+    }
+  }
+}
