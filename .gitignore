@@ -2,3 +2,15 @@ node_modules/
 .env
 dist/
 coverage/
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.pnpm-store/
+.DS_Store
+.idea/
+.vscode/
+.env.local
+.env.*.local
+.cache/
+build/
