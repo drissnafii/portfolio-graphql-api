@@ -5,9 +5,7 @@ export type GraphQLContext = {
   // user?: UserDocument; 
 };
 
-export const createContext = async ({
-  req,
-}: ExpressContextFunctionArgument): Promise<GraphQLContext> => {
+export const createContext = async ({req,}: ExpressContextFunctionArgument): Promise<GraphQLContext> => {
   const token = req.headers.authorization;
   
   return { token };
