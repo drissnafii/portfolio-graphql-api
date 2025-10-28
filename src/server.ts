@@ -1,66 +1,28 @@
 import 'dotenv/config';
-import express from 'express';
-import { createServer } from 'node:http';
-import cors from 'cors';
-import { ApolloServer } from '@apollo/server';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import {
-  expressMiddleware,
-  type ExpressContextFunctionArgument,
-} from '@as-integrations/express5';
 import connectDB from './config/database.js';
-
-const typeDefs = `#graphql
-  type Query {
-    hello: String
-  }
-`;
-
-const resolvers = {
-  Query: {
-    hello: () => 'API is up and running with Express!',
-  },
-};
-
-type GraphQLContext = {
-  token?: string;
-};
+import { createApolloServer } from './app.js'; // Importation de la fonction de configuration
 
 const port = Number(process.env.PORT) || 4000;
 
-async function startApolloServer() {
-  await connectDB();
+// Main function to start the server
+async function startServer() {
+  try {
 
-  const app = express();
-  const httpServer = createServer(app);
+    // 1. connect into the DB
+    await connectDB();
+    console.log('✅ Database connected successfully');
 
-  const server = new ApolloServer<GraphQLContext>({
-    typeDefs,
-    resolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-  });
+    // 2. create the server (from the app.ts)
+    const { httpServer } = await createApolloServer();
 
-  await server.start();
-
-  app.use(
-    '/graphql',
-    cors<cors.CorsRequest>(),
-    express.json(),
-    expressMiddleware(server, {
-      context: async ({
-        req,
-      }: ExpressContextFunctionArgument): Promise<GraphQLContext> => ({
-        token: req.headers.authorization,
-      }),
-    }),
-  );
-
-  await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
-
-  console.log(`✅ Apollo Server v5 ready at http://localhost:${port}/graphql`);
+    // start the server + listning
+    await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
+    console.log(`🚀 Server ready at http://localhost:${port}/graphql`);
+  
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
 }
 
-startApolloServer().catch((error) => {
-  console.error('❌ Failed to start server:', error);
-  process.exit(1);
-});
+startServer();
