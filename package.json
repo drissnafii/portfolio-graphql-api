@@ -12,13 +12,23 @@
     "format": "prettier --write .",
     "prepare": "husky install"
   },
-  "keywords": ["graphql", "apollo", "typescript", "nodejs", "portfolio", "api"],
+  "keywords": [
+    "graphql",
+    "apollo",
+    "typescript",
+    "nodejs",
+    "portfolio",
+    "api"
+  ],
   "author": "Driss Nafii",
   "license": "ISC",
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
     "@apollo/server": "^5.0.0",
+    "@as-integrations/express5": "^1.1.2",
+    "@types/cors": "^2.8.19",
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "graphql": "^16.11.0",
