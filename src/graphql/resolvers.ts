@@ -9,6 +9,7 @@ import { ProjectSkillModel } from '../models/ProjectSkill.js';
 import { GraphQLScalarType, Kind } from 'graphql';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/jwt.js'; // Importe notre nouvelle fonction
+import { isAdmin } from '../guards/auth.guard.js';
 
 export const resolvers = {
   Date: new GraphQLScalarType({
@@ -104,49 +105,61 @@ export const resolvers = {
 
     // Profile
     createProfile: async (_: any, args: any, context: GraphQLContext) => {
+      isAdmin(context);
       const newProfile = new ProfileModel({ ...args, createdBy_id: context.user?.id });
       return await newProfile.save();
     },
     updateProfile: async (_: any, { id, ...args }: any, context: GraphQLContext) => {
+      isAdmin(context);
       return await ProfileModel.findByIdAndUpdate(id, { ...args, updatedBy_id: context.user?.id }, { new: true });
     },
-    deleteProfile: async (_: any, { id }: { id: string }) => {
+    deleteProfile: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
+      isAdmin(context);
       return await ProfileModel.findByIdAndDelete(id);
     },
 
     // Experience
     createExperience: async (_: any, args: any, context: GraphQLContext) => {
+      isAdmin(context);
       const newExperience = new ExperienceModel({ ...args, createdBy_id: context.user?.id });
       return await newExperience.save();
     },
     updateExperience: async (_: any, { id, ...args }: any, context: GraphQLContext) => {
+      isAdmin(context);
       return await ExperienceModel.findByIdAndUpdate(id, { ...args, updatedBy_id: context.user?.id }, { new: true });
     },
-    deleteExperience: async (_: any, { id }: { id: string }) => {
+    deleteExperience: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
+      isAdmin(context);
       return await ExperienceModel.findByIdAndDelete(id);
     },
 
     // Project
     createProject: async (_: any, args: any, context: GraphQLContext) => {
+      isAdmin(context);
       const newProject = new ProjectModel({ ...args, createdBy_id: context.user?.id });
       return await newProject.save();
     },
     updateProject: async (_: any, { id, ...args }: any, context: GraphQLContext) => {
+      isAdmin(context);
       return await ProjectModel.findByIdAndUpdate(id, { ...args, updatedBy_id: context.user?.id }, { new: true });
     },
-    deleteProject: async (_: any, { id }: { id: string }) => {
+    deleteProject: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
+      isAdmin(context);
       return await ProjectModel.findByIdAndDelete(id);
     },
 
     // Skill
     createSkill: async (_: any, args: any, context: GraphQLContext) => {
+      isAdmin(context);
       const newSkill = new SkillModel({ ...args, createdBy_id: context.user?.id });
       return await newSkill.save();
     },
     updateSkill: async (_: any, { id, ...args }: any, context: GraphQLContext) => {
+      isAdmin(context);
       return await SkillModel.findByIdAndUpdate(id, { ...args, updatedBy_id: context.user?.id }, { new: true });
     },
-    deleteSkill: async (_: any, { id }: { id: string }) => {
+    deleteSkill: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
+      isAdmin(context);
       return await SkillModel.findByIdAndDelete(id);
     },
   },
