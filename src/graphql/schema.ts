@@ -80,6 +80,12 @@ export const typeDefs = `#graphql
     usage_level: Int
   }
 
+  # Un type de réponse pour le login, c'est une bonne pratique
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
   type Query {
     # User
     users: [User!]!
@@ -105,6 +111,9 @@ export const typeDefs = `#graphql
   # Add other input types for mutations
 
   type Mutation {
+    # On ajoute la mutation de connexion ici
+    login(email: String!, password: String!): AuthPayload!
+
     # User
     createUser(username: String!, email: String!, password: String!, role: String): User!
     updateUser(id: ID!, username: String, email: String, role: String): User

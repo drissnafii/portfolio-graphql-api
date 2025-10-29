@@ -14,13 +14,19 @@ services:
     depends_on:
       - db
     environment:
-      MONGO_URI: mongodb://db:27017/codefolio
-      JWT_SECRET: your_super_secret_key_here
+      MONGO_URI: mongodb://drissnafii:TheDendo2005@db:27017/codefolio?authSource=admin
+      JWT_SECRET: ceci-est-un-secret-temporaire-a-changer-en-production
       CI: "true"
 
   db:
-    image: mongo:6.0
+    image: mongo:8.0
     container_name: codefolio_db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: drissnafii
+      MONGO_INITDB_ROOT_PASSWORD: TheDendo2005
+      MONGO_INITDB_DATABASE: codefolio
+    ports:
+      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
 

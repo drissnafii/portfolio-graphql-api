@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import cors from 'cors';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { expressMiddleware } from '@as-integrations/express5';
 
 // 1. import GraphQL partes 
@@ -18,7 +19,33 @@ export async function createApolloServer() {
   const server = new ApolloServer<GraphQLContext>({
     typeDefs,
     resolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      ApolloServerPluginLandingPageLocalDefault({ includeCookies: true }),
+    ],
+    formatError: (formattedError, error) => {
+      const anyErr = error as unknown as Record<string, any>;
+      const original = anyErr.originalError
+        || anyErr.extensions?.originalError
+        || anyErr.extensions?.exception
+        || anyErr;
+
+      const code = original?.code;
+      const keyValue = original?.keyValue ?? original?.errorResponse?.keyValue;
+
+      if (code === 11000 && keyValue && typeof keyValue === 'object') {
+        const duplicatedField = Object.keys(keyValue)[0] ?? 'champ';
+        return {
+          ...formattedError,
+          message: `Un utilisateur avec ce/cette ${duplicatedField} existe déjà.`,
+          extensions: {
+            ...formattedError.extensions,
+            code: 'DUPLICATE_KEY',
+          },
+        };
+      }
+      return formattedError;
+    },
   });
 
   await server.start(); // Starting the Appolo server

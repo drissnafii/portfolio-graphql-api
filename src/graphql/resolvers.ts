@@ -7,6 +7,8 @@ import { ProjectModel } from '../models/Project.js';
 import { SkillModel } from '../models/Skill.js';
 import { ProjectSkillModel } from '../models/ProjectSkill.js';
 import { GraphQLScalarType, Kind } from 'graphql';
+import bcrypt from 'bcrypt';
+import { generateToken } from '../utils/jwt.js'; // Importe notre nouvelle fonction
 
 export const resolvers = {
   Date: new GraphQLScalarType({
@@ -57,6 +59,37 @@ export const resolvers = {
   },
 
   Mutation: {
+    // Resolver pour la mutation de connexion
+    login: async (_: any, { email, password }: any) => {
+      // 1. Trouver l'utilisateur par son email
+      // On utilise .select('+password') pour forcer Mongoose à inclure le champ
+      // du mot de passe, qui est caché par défaut dans notre modèle.
+      const user = await UserModel.findOne({ email }).select('+password');
+      if (!user) {
+        throw new Error('Invalid credentials: User not found.');
+      }
+
+      // 2. Vérifier le mot de passe
+      // 2. Vérifier le mot de passe
+      // On compare le mot de passe fourni avec le hash stocké dans la base de données
+      if (!user.password) {
+        throw new Error('Server error: User password not found.');
+      }
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        throw new Error('Invalid credentials: Password incorrect.');
+      }
+
+      // 3. Si tout est correct, générer un token JWT
+      const token = generateToken(user);
+
+      // 4. Retourner le payload d'authentification
+      return {
+        token,
+        user,
+      };
+    },
+
     // User
     createUser: async (_: any, args: any) => {
       const newUser = new UserModel(args);
