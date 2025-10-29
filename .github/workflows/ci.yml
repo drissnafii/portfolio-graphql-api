@@ -1,0 +1,45 @@
+name: CI Pipeline # Le nom du workflow
+
+# Déclenche le workflow à chaque push sur la branche 'main' ou 'develop'
+# et à chaque Pull Request ouverte vers ces branches
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Un "job" nommé "build-and-test"
+  build-and-test:
+    # Le type de machine sur lequel le job va tourner
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1: Récupérer le code du repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Étape 2: Installer pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10 # Spécifiez votre version de pnpm
+
+      # Étape 3: Installer Node.js (version 20)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm' # Active le cache pour accélérer les installations futures
+
+      # Étape 4: Installer les dépendances du projet
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile 
+
+      # Étape 5: Lancer le linter pour vérifier la qualité du code
+      - name: Run linter
+        run: pnpm run lint
+
+      # Étape 6: Lancer les tests
+      - name: Run tests
+        run: pnpm test
