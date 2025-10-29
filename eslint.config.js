@@ -1,6 +1,7 @@
 
 import js from '@eslint/js';
 import globals from 'globals';
+import globals from 'globals';
 import pluginTs from '@typescript-eslint/eslint-plugin';
 import parserTs from '@typescript-eslint/parser';
 
@@ -14,12 +15,6 @@ export default [
         project: './tsconfig.json',
       },
       globals: {
-        process: 'readonly',
-        console: 'readonly',
-        __dirname: 'readonly',
-        module: 'readonly',
-        require: 'readonly',
-        exports: 'readonly',
         ...globals.node,
       },
     },
@@ -30,9 +25,6 @@ export default [
       ...pluginTs.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'off', // Disable 'no-explicit-any' rule
       // Add custom rules here
-    },
-    env: {
-      node: true,
     },
   },
 ];
