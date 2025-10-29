@@ -21,7 +21,7 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off', // Disable 'no-explicit-any' rule
       // Add custom rules here
     },
-    environment: {
+    env: {
       node: true,
     },
   },
