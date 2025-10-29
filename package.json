@@ -25,7 +25,6 @@
   ],
   "author": "Driss Nafii",
   "license": "ISC",
-  "packageManager": "pnpm@10.19.0",
   "dependencies": {
     "@apollo/server": "^5.0.0",
     "@as-integrations/express5": "^1.1.2",
