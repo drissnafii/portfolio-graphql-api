@@ -42,4 +42,7 @@ jobs:
 
       # Étape 6: Lancer les tests
       - name: Run tests
+        env:
+          # Provide a dummy secret for the test environment
+          JWT_SECRET: a-super-secret-key-for-ci-tests
         run: pnpm test
