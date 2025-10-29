@@ -17,10 +17,12 @@ describe('config/database connectDB', () => {
 
   it('exits when MONGO_URI is missing', async () => {
     delete process.env.MONGO_URI;
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementationOnce((() => undefined) as any);
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {
+      throw new Error('process.exit() was called.');
+    }) as any);
     const logSpy = vi.spyOn(logger, 'error').mockImplementation(() => logger as any);
-    await (dbModule as any).default();
-    expect(exitSpy).toHaveBeenCalled();
+
+    await expect((dbModule as any).default()).rejects.toThrow('process.exit() was called.');
     expect(logSpy).toHaveBeenCalled();
   });
 
@@ -34,5 +36,3 @@ describe('config/database connectDB', () => {
     expect(logSpy).toHaveBeenCalled();
   });
 });
-
-
