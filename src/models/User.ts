@@ -1,9 +1,9 @@
-import { Schema, model, type Model } from 'mongoose';
+import { Schema, model, type Model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 // 1. Définir une interface pour le document (pour le typage)
 // C'est ce qui rend notre modèle "conscient" de sa structure
-export interface IUser {
+export interface IUser extends Document {
   username: string;
   email: string;
   password?: string; // Optionnel car on ne veut pas toujours le renvoyer

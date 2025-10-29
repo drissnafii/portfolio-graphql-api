@@ -1,11 +1,133 @@
-import { resolvers } from './resolvers.js'; 
-
 export const typeDefs = `#graphql
+  scalar Date
+
+  type User {
+    id: ID!
+    username: String!
+    email: String!
+    role: String!
+  }
+
+  type Profile {
+    id: ID!
+    createdBy: User!
+    updatedBy: User
+    lastName: String!
+    firstName: String!
+    title: String!
+    biography: String!
+    email: String!
+    phone: String
+    address: String
+    photo: String
+    github: String
+    linkedin: String
+    twitter: String
+    website: String
+    cv: String
+  }
+
+  type Experience {
+    id: ID!
+    createdBy: User!
+    updatedBy: User
+    position: String!
+    company: String!
+    location: String
+    description: String!
+    startDate: Date!
+    endDate: Date
+    current: Boolean!
+    technologies: [String!]
+    achievements: [String!]
+    logo: String
+  }
+
+  type Project {
+    id: ID!
+    createdBy: User!
+    updatedBy: User
+    title: String!
+    description: String!
+    technologies: [String!]
+    projectUrl: String
+    githubUrl: String
+    images: [String!]
+    startDate: Date!
+    endDate: Date
+    status: String!
+    order: Int
+    featured: Boolean!
+    skills: [ProjectSkill!]
+  }
+
+  type Skill {
+    id: ID!
+    createdBy: User!
+    updatedBy: User
+    name: String!
+    category: String!
+    level: Int!
+    icon: String
+    description: String
+    order: Int
+  }
+
+  type ProjectSkill {
+    id: ID!
+    project: Project!
+    skill: Skill!
+    usage_level: Int
+  }
+
   type Query {
-    hello: String,
-    name: String,
-    birthYear: Int,
-    currentYear: Int,
-    age: Int,
+    # User
+    users: [User!]!
+    user(id: ID!): User
+
+    # Profile
+    profiles: [Profile!]!
+    profile(id: ID!): Profile
+
+    # Experience
+    experiences: [Experience!]!
+    experience(id: ID!): Experience
+
+    # Project
+    projects: [Project!]!
+    project(id: ID!): Project
+
+    # Skill
+    skills: [Skill!]!
+    skill(id: ID!): Skill
+  }
+
+  # Add other input types for mutations
+
+  type Mutation {
+    # User
+    createUser(username: String!, email: String!, password: String!, role: String): User!
+    updateUser(id: ID!, username: String, email: String, role: String): User
+    deleteUser(id: ID!): User
+
+    # Profile
+    createProfile(lastName: String!, firstName: String!, title: String!, biography: String!, email: String!): Profile!
+    updateProfile(id: ID!, lastName: String, firstName: String, title: String, biography: String, email: String): Profile
+    deleteProfile(id: ID!): Profile
+
+    # Experience
+    createExperience(position: String!, company: String!, description: String!, startDate: Date!, current: Boolean!): Experience!
+    updateExperience(id: ID!, position: String, company: String, description: String, startDate: Date, current: Boolean): Experience
+    deleteExperience(id: ID!): Experience
+
+    # Project
+    createProject(title: String!, description: String!, startDate: Date!, status: String!, featured: Boolean!): Project!
+    updateProject(id: ID!, title: String, description: String, startDate: Date, status: String, featured: Boolean): Project
+    deleteProject(id: ID!): Project
+
+    # Skill
+    createSkill(name: String!, category: String!, level: Int!): Skill!
+    updateSkill(id: ID!, name: String, category: String, level: Int): Skill
+    deleteSkill(id: ID!): Skill
   }
 `;
