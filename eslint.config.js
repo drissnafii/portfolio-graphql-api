@@ -1,5 +1,6 @@
 
 import js from '@eslint/js';
+import globals from 'globals';
 import pluginTs from '@typescript-eslint/eslint-plugin';
 import parserTs from '@typescript-eslint/parser';
 
@@ -19,6 +20,7 @@ export default [
         module: 'readonly',
         require: 'readonly',
         exports: 'readonly',
+        ...globals.node,
       },
     },
     plugins: {
