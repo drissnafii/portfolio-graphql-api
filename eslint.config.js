@@ -26,4 +26,12 @@ export default [
       // Add custom rules here
     },
   },
+  {
+    // Target only test files
+    files: ['tests/**/*.ts'],
+    rules: {
+      // Allow unused variables in tests, but show a warning
+      '@typescript-eslint/no-unused-vars': 'warn',
+    },
+  },
 ];
