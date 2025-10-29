@@ -1,16 +1,21 @@
 import 'dotenv/config';
-import http from 'http';
 import connectDB from './config/database.js';
 import { createApolloServer } from './app.js';
+import logger from './config/logger.js';
 
 async function startApolloServer() {
-  await connectDB();
+  try {
+    await connectDB();
 
-  const { app, httpServer } = await createApolloServer();
+    const { httpServer } = await createApolloServer();
 
-  const PORT = process.env.PORT || 4000;
-  await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, resolve));
-  console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+    const PORT = process.env.PORT || 4000;
+    await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, resolve));
+    logger.info(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+  } catch (error) {
+    logger.error(`❌ Failed to start server: ${(error as Error).message}`);
+    process.exit(1);
+  }
 }
 
 startApolloServer();

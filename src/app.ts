@@ -5,6 +5,7 @@ import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { expressMiddleware } from '@as-integrations/express5';
+import morgan from 'morgan';
 
 // 1. import GraphQL partes 
 import { typeDefs } from './graphql/schema.js';
@@ -53,6 +54,7 @@ export async function createApolloServer() {
   // 3. use Middlewares
   app.use(
     '/graphql',
+    morgan('dev'),
     cors<cors.CorsRequest>(),
     express.json(),
     // use the function that we exported in the contex file !
