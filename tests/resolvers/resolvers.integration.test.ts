@@ -12,10 +12,6 @@ vi.mock('../models/Profile.js');
 vi.mock('../models/Project.js');
 vi.mock('../models/Skill.js');
 vi.mock('../models/Experience.js');
-vi.mock('../../src/models/Profile.js');
-vi.mock('../../src/models/Project.js');
-vi.mock('../../src/models/Skill.js');
-vi.mock('../../src/models/Experience.js');
 
 describe('[Integration] getPortfolio Query', () => {
   let testServer: ApolloServer;
@@ -29,7 +25,7 @@ describe('[Integration] getPortfolio Query', () => {
     vi.resetAllMocks();
   });
 
-  it('should fetch and return the complete portfolio payload', async () => {
+  it.only('should fetch and return the complete portfolio payload', async () => {
     // 1. ARRANGE: Prepare mock data for each model
     const mockProfile = {
       id: 'profile1',

@@ -131,8 +131,28 @@ export const typeDefs = `#graphql
     deleteUser(id: ID!): User
 
     # Profile
-    createProfile(lastName: String!, firstName: String!, title: String!, biography: String!, email: String!): Profile!
-    updateProfile(id: ID!, lastName: String, firstName: String, title: String, biography: String, email: String): Profile
+    createProfile(
+      # Required fields
+      lastName: String!
+      firstName: String!
+      title: String!
+      biography: String!
+      email: String!
+      # Optional fields
+      phone: String
+      address: String
+      photo: String
+      github: String
+      linkedin: String
+      twitter: String
+      website: String
+      cv: String
+    ): Profile!
+    updateProfile(
+      id: ID!
+      lastName: String, firstName: String, title: String, biography: String, email: String
+      phone: String, address: String, photo: String, github: String, linkedin: String, twitter: String, website: String, cv: String
+    ): Profile
     deleteProfile(id: ID!): Profile
 
     # Experience
