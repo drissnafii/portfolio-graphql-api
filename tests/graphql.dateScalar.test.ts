@@ -14,11 +14,18 @@ describe('Date scalar', () => {
     const result = (resolvers as any).Date.parseValue('2023-10-30T12:34:56.000Z');
     expect(result instanceof Date).toBe(true);
   });
+  it('parseValue throws on numeric-like string', () => {
+    expect(() => (resolvers as any).Date.parseValue('123')).toThrow();
+  });
   it('parseValue throws on invalid value', () => {
     expect(() => (resolvers as any).Date.parseValue('invalid date string')).toThrow();
   });
   it('parseLiteral returns null on invalid literal', () => {
     const res = (resolvers as any).Date.parseLiteral({ kind: Kind.STRING, value: 'not-a-date' } as any);
+    expect(res).toBeNull();
+  });
+  it('parseLiteral returns null on numeric-like string literal', () => {
+    const res = (resolvers as any).Date.parseLiteral({ kind: Kind.STRING, value: '123' } as any);
     expect(res).toBeNull();
   });
   it('parseLiteral parses INT literal', () => {
@@ -33,4 +40,3 @@ describe('Date scalar', () => {
     expect(res instanceof Date).toBe(true);
   });
 });
-

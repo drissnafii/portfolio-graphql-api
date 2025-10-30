@@ -96,7 +96,18 @@ export const resolvers = {
     },
     parseValue(value) {
       if (typeof value === 'number' || typeof value === 'string') {
-        const parsedDate = new Date(value);
+        const stringValue = typeof value === 'string' ? value.trim() : value;
+
+        if (
+          typeof stringValue === 'string' &&
+          (stringValue === '' || /^\d+$/.test(stringValue))
+        ) {
+          throw new Error(
+            'GraphQL Date Scalar parser expected a valid ISO 8601 date string, not a numeric string.'
+          );
+        }
+
+        const parsedDate = new Date(stringValue);
         if (!isNaN(parsedDate.getTime())) {
           return parsedDate;
         }
@@ -107,6 +118,13 @@ export const resolvers = {
     },
     parseLiteral(ast) {
       if (ast.kind === Kind.INT || ast.kind === Kind.STRING) {
+        if (ast.kind === Kind.STRING) {
+          const trimmed = ast.value.trim();
+          if (trimmed === '' || /^\d+$/.test(trimmed)) {
+            return null;
+          }
+        }
+
         const literalValue = ast.kind === Kind.INT ? parseInt(ast.value, 10) : ast.value;
         const parsedDate = new Date(literalValue);
         if (!isNaN(parsedDate.getTime())) {
