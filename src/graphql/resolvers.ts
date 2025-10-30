@@ -57,6 +57,23 @@ export const resolvers = {
     // Skill
     skills: async () => await SkillModel.find(),
     skill: async (_: any, { id }: { id: string }) => await SkillModel.findById(id),
+
+    // Resolver for getPortfolio
+    getPortfolio: async () => {
+      // en lance toutes les requêtes à la base de données en même temps
+      // Promise.all attend que toutes les promesses soient résolues
+      const [profile, projects, skills, experiences] = await Promise.all([
+        // On suppose qu'il n'y a qu'un seul profil (logique singleton)
+        ProfileModel.findOne().lean(),
+        // L'utilisation de .lean() est une optimisation Mongoose qui retourne des objets JavaScript simples,
+        // ce qui est plus rapide car nous n'avons pas besoin des méthodes Mongoose ici.
+        ProjectModel.find().sort({ startDate: -1 }).lean(),
+        SkillModel.find().sort({ order: 1 }).lean(),
+        ExperienceModel.find().sort({ startDate: -1 }).lean(),
+      ]); 
+
+      return { profile, projects, skills, experiences };
+    }
   },
 
   Mutation: {

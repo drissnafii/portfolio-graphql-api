@@ -86,6 +86,14 @@ export const typeDefs = `#graphql
     user: User!
   }
 
+  # Un type spécial pour la réponse de la query getPortfolio
+  type PortfolioPayload {
+    profile: Profile
+    projects: [Project!]!
+    skills: [Skill!]!
+    experiences: [Experience!]!
+  }
+
   type Query {
     # User
     users: [User!]!
@@ -106,6 +114,9 @@ export const typeDefs = `#graphql
     # Skill
     skills: [Skill!]!
     skill(id: ID!): Skill
+
+    # Portfolio
+    getPortfolio: PortfolioPayload!
   }
 
   # Add other input types for mutations
