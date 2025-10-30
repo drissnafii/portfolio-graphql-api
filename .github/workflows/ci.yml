@@ -17,17 +17,17 @@ jobs:
     steps:
       # Étape 1: Récupérer le code du repository
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       # Étape 2: Installer pnpm
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v2
         with:
           version: latest
 
       # Étape 3: Installer Node.js (version 20)
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
           cache: 'pnpm' # Active le cache pour accélérer les installations futures
