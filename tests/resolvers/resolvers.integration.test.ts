@@ -25,7 +25,6 @@ describe('[Integration] getPortfolio Query', () => {
     vi.resetAllMocks();
   });
 
-  it.only('should fetch and return the complete portfolio payload', async () => {
   it('should fetch and return the complete portfolio payload', async () => {
     // 1. ARRANGE: Prepare mock data for each model
     const mockProfile = {
