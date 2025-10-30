@@ -217,5 +217,12 @@ export const typeDefs = `#graphql
     createSkill(name: String!, category: String!, level: Int!): Skill!
     updateSkill(id: ID!, name: String, category: String, level: Int): Skill
     deleteSkill(id: ID!): Skill
+
+    # ProjectSkill
+    addSkillToProject(
+      projectId: ID!
+      skillId: ID!
+      usage_level: Int
+    ): ProjectSkill!
   }
 `;

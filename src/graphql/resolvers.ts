@@ -11,6 +11,13 @@ import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/jwt.js'; // Importe notre nouvelle fonction
 import { isAdmin } from '../guards/auth.guard.js';
 
+const DUPLICATE_KEY_ERROR_CODE = 11000;
+const isDuplicateKeyError = (error: unknown): error is { code: number } =>
+  typeof error === 'object' &&
+  error !== null &&
+  'code' in error &&
+  (error as { code?: number }).code === DUPLICATE_KEY_ERROR_CODE;
+
 export const resolvers = {
   Date: new GraphQLScalarType({
     name: 'Date',
@@ -172,6 +179,46 @@ export const resolvers = {
     deleteProject: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
       isAdmin(context);
       return await ProjectModel.findByIdAndDelete(id);
+    },
+
+    addSkillToProject: async (
+      _: any,
+      { projectId, skillId, usage_level }: { projectId: string; skillId: string; usage_level?: number },
+      context: GraphQLContext
+    ) => {
+      isAdmin(context);
+
+      const projectExists = await ProjectModel.exists({ _id: projectId });
+      if (!projectExists) {
+        throw new GraphQLError('Project not found.', {
+          extensions: { code: 'PROJECT_NOT_FOUND' },
+        });
+      }
+
+      const skillExists = await SkillModel.exists({ _id: skillId });
+      if (!skillExists) {
+        throw new GraphQLError('Skill not found.', {
+          extensions: { code: 'SKILL_NOT_FOUND' },
+        });
+      }
+
+      try {
+        const payload = {
+          project_id: projectId,
+          skill_id: skillId,
+          ...(usage_level !== undefined ? { usage_level } : {}),
+        };
+
+        return await ProjectSkillModel.create(payload);
+      } catch (error: unknown) {
+        if (isDuplicateKeyError(error)) {
+          throw new GraphQLError('Skill already linked to this project.', {
+            extensions: { code: 'PROJECT_SKILL_DUPLICATE' },
+          });
+        }
+
+        throw error;
+      }
     },
 
     // Skill
