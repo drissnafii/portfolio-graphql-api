@@ -6,7 +6,7 @@ import { ExperienceModel } from '../models/Experience.js';
 import { ProjectModel } from '../models/Project.js';
 import { SkillModel } from '../models/Skill.js';
 import { ProjectSkillModel } from '../models/ProjectSkill.js';
-import { GraphQLScalarType, Kind } from 'graphql';
+import { GraphQLScalarType, GraphQLError, Kind } from 'graphql';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../utils/jwt.js'; // Importe notre nouvelle fonction
 import { isAdmin } from '../guards/auth.guard.js';
@@ -14,7 +14,8 @@ import { isAdmin } from '../guards/auth.guard.js';
 export const resolvers = {
   Date: new GraphQLScalarType({
     name: 'Date',
-    description: 'Date custom scalar type',
+    description:
+      'Date custom scalar type. Accepts a Unix timestamp in milliseconds or an ISO 8601 date string.',
     serialize(value) {
       if (value instanceof Date) {
         return value.getTime(); // Convert outgoing Date to integer for JSON
@@ -22,17 +23,25 @@ export const resolvers = {
       throw Error('GraphQL Date Scalar serializer expected a `Date` object');
     },
     parseValue(value) {
-      if (typeof value === 'number') {
-        return new Date(value); // Convert incoming integer to Date
+      if (typeof value === 'number' || typeof value === 'string') {
+        const parsedDate = new Date(value);
+        if (!isNaN(parsedDate.getTime())) {
+          return parsedDate;
+        }
       }
-      throw new Error('GraphQL Date Scalar parser expected a `number`');
+      throw new Error(
+        'GraphQL Date Scalar parser expected a valid Unix timestamp (ms) or ISO 8601 date string.'
+      );
     },
     parseLiteral(ast) {
-      if (ast.kind === Kind.INT) {
-        // Convert hard-coded AST string to integer and then to Date
-        return new Date(parseInt(ast.value, 10));
+      if (ast.kind === Kind.INT || ast.kind === Kind.STRING) {
+        const literalValue = ast.kind === Kind.INT ? parseInt(ast.value, 10) : ast.value;
+        const parsedDate = new Date(literalValue);
+        if (!isNaN(parsedDate.getTime())) {
+          return parsedDate;
+        }
       }
-      // Invalid hard-coded value (not an integer)
+      // Invalid hard-coded value
       return null;
     },
   }),
@@ -168,6 +177,15 @@ export const resolvers = {
     // Skill
     createSkill: async (_: any, args: any, context: GraphQLContext) => {
       isAdmin(context);
+      const existingSkill = await SkillModel.findOne({ name: args.name }).lean();
+      if (existingSkill) {
+        throw new GraphQLError('This skill already exists. Use updateSkill to modify it.', {
+          extensions: {
+            code: 'SKILL_ALREADY_EXISTS',
+            skillId: existingSkill._id.toString(),
+          },
+        });
+      }
       const newSkill = new SkillModel({ ...args, createdBy_id: context.user?.id });
       return await newSkill.save();
     },

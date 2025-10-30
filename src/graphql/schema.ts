@@ -156,13 +156,61 @@ export const typeDefs = `#graphql
     deleteProfile(id: ID!): Profile
 
     # Experience
-    createExperience(position: String!, company: String!, description: String!, startDate: Date!, current: Boolean!): Experience!
-    updateExperience(id: ID!, position: String, company: String, description: String, startDate: Date, current: Boolean): Experience
+    createExperience(
+      position: String!
+      company: String!
+      description: String!
+      startDate: Date!
+      current: Boolean!
+      location: String
+      endDate: Date
+      technologies: [String!]
+      achievements: [String!]
+      logo: String
+    ): Experience!
+    updateExperience(
+      id: ID!
+      position: String
+      company: String
+      description: String
+      startDate: Date
+      endDate: Date
+      current: Boolean
+      location: String
+      technologies: [String!]
+      achievements: [String!]
+      logo: String
+    ): Experience
     deleteExperience(id: ID!): Experience
 
     # Project
-    createProject(title: String!, description: String!, startDate: Date!, status: String!, featured: Boolean!): Project!
-    updateProject(id: ID!, title: String, description: String, startDate: Date, status: String, featured: Boolean): Project
+    createProject(
+      title: String!
+      description: String!
+      startDate: Date!
+      status: String!
+      featured: Boolean!
+      endDate: Date
+      technologies: [String!]
+      projectUrl: String
+      githubUrl: String
+      images: [String!]
+      order: Int
+    ): Project!
+    updateProject(
+      id: ID!
+      title: String
+      description: String
+      startDate: Date
+      endDate: Date
+      status: String
+      featured: Boolean
+      technologies: [String!]
+      projectUrl: String
+      githubUrl: String
+      images: [String!]
+      order: Int
+    ): Project
     deleteProject(id: ID!): Project
 
     # Skill
