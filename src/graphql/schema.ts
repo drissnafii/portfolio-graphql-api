@@ -1,6 +1,11 @@
 export const typeDefs = `#graphql
   scalar Date
 
+  enum OrderDirection {
+    asc
+    desc
+  }
+
   type User {
     id: ID!
     username: String!
@@ -89,9 +94,23 @@ export const typeDefs = `#graphql
   # Un type spécial pour la réponse de la query getPortfolio
   type PortfolioPayload {
     profile: Profile
-    projects: [Project!]!
-    skills: [Skill!]!
+    projects(orderBy: ProjectOrderByInput): [Project!]!
+    skills(orderBy: SkillOrderByInput): [Skill!]!
     experiences: [Experience!]!
+  }
+
+  input ProjectOrderByInput {
+    featured: OrderDirection
+    startDate: OrderDirection
+    order: OrderDirection
+    title: OrderDirection
+  }
+
+  input SkillOrderByInput {
+    level: OrderDirection
+    name: OrderDirection
+    category: OrderDirection
+    order: OrderDirection
   }
 
   type Query {

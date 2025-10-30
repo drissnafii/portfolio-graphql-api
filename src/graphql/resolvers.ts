@@ -18,6 +18,71 @@ const isDuplicateKeyError = (error: unknown): error is { code: number } =>
   'code' in error &&
   (error as { code?: number }).code === DUPLICATE_KEY_ERROR_CODE;
 
+type OrderDirection = 'asc' | 'desc';
+type OrderByArg = Record<string, OrderDirection | null | undefined>;
+
+const isOrderDirection = (value: unknown): value is OrderDirection =>
+  value === 'asc' || value === 'desc';
+
+const toComparableValue = (value: unknown): number | string => {
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+  if (typeof value === 'number' || typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'boolean') {
+    return value ? 1 : 0;
+  }
+  return String(value ?? '');
+};
+
+const sortByFields = <T extends Record<string, unknown>>(
+  items: T[] = [],
+  orderBy?: OrderByArg
+): T[] => {
+  if (!orderBy) {
+    return items;
+  }
+
+  const entries = Object.entries(orderBy).filter(([, dir]) => isOrderDirection(dir));
+  if (entries.length === 0) {
+    return items;
+  }
+
+  return [...items].sort((a, b) => {
+    for (const [field, direction] of entries) {
+      const dirMultiplier = direction === 'desc' ? -1 : 1;
+      const aValue = a[field];
+      const bValue = b[field];
+
+      if (aValue === bValue) {
+        continue;
+      }
+
+      if (aValue == null) {
+        return -dirMultiplier;
+      }
+
+      if (bValue == null) {
+        return dirMultiplier;
+      }
+
+      const comparableA = toComparableValue(aValue);
+      const comparableB = toComparableValue(bValue);
+
+      if (comparableA < comparableB) {
+        return -dirMultiplier;
+      }
+      if (comparableA > comparableB) {
+        return dirMultiplier;
+      }
+    }
+
+    return 0;
+  });
+};
+
 export const resolvers = {
   Date: new GraphQLScalarType({
     name: 'Date',
@@ -247,6 +312,16 @@ export const resolvers = {
   },
 
   // Relational Resolvers
+  PortfolioPayload: {
+    projects: (
+      payload: { projects?: Record<string, unknown>[] },
+      { orderBy }: { orderBy?: OrderByArg }
+    ) => sortByFields(payload.projects ?? [], orderBy),
+    skills: (
+      payload: { skills?: Record<string, unknown>[] },
+      { orderBy }: { orderBy?: OrderByArg }
+    ) => sortByFields(payload.skills ?? [], orderBy),
+  },
   Profile: {
     createdBy: async (profile: any) => await UserModel.findById(profile.createdBy_id),
     updatedBy: async (profile: any) => await UserModel.findById(profile.updatedBy_id),
