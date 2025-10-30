@@ -5,6 +5,7 @@ import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { expressMiddleware } from '@as-integrations/express5';
+import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 
 // 1. import GraphQL partes 
@@ -16,6 +17,15 @@ import { createContext, type GraphQLContext } from './graphql/context.js';
 export async function createApolloServer() {
   const app = express();
   const httpServer = createServer(app);
+
+  // Create the rate limiting middleware
+  const limiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // Default to 15 minutes
+    max: parseInt(process.env.RATE_LIMIT_MAX || '100', 10), // Default to 100 requests
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    message: 'Too many requests from this IP, please try again after 15 minutes.',
+  });
 
   const server = new ApolloServer<GraphQLContext>({
     typeDefs,
@@ -54,6 +64,7 @@ export async function createApolloServer() {
   // 3. use Middlewares
   app.use(
     '/graphql',
+    limiter, // Apply the rate limiting middleware to GraphQL endpoint
     morgan('dev'),
     cors<cors.CorsRequest>(),
     express.json(),
