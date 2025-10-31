@@ -1,0 +1,11 @@
+export const authTypeDefs = /* GraphQL */ `
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
+  extend type Mutation {
+    login(email: String!, password: String!): AuthPayload!
+  }
+`;
+

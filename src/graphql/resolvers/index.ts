@@ -1,4 +1,5 @@
 import merge from 'lodash.merge';
+import { baseResolvers } from './base.resolvers.js';
 import { authResolvers } from './auth.resolvers.js';
 import { experienceResolvers } from './experience.resolvers.js';
 import { portfolioResolvers } from './portfolio.resolvers.js';
@@ -11,6 +12,7 @@ import { dateScalar } from './scalars.js';
 
 export const resolvers = merge(
   { Date: dateScalar },
+  baseResolvers,
   authResolvers,
   userResolvers,
   profileResolvers,
