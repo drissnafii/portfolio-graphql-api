@@ -18,7 +18,12 @@ export const projectTypeDefs = /* GraphQL */ `
   }
 
   extend type Query {
-    projects: [Project!]!
+    projects(
+      status: String
+      featured: Boolean
+      limit: Int
+      offset: Int
+    ): [Project!]!
     project(id: ID!): Project
   }
 

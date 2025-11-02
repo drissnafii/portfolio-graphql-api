@@ -9,7 +9,35 @@ import { isDuplicateKeyError } from '../utils/errors.js';
 
 export const projectResolvers = {
   Query: {
-    projects: async () => await ProjectModel.find(),
+    projects: async (
+      _: unknown,
+      {
+        status,
+        featured,
+        limit = 100,
+        offset = 0,
+      }: {
+        status?: string;
+        featured?: boolean;
+        limit?: number;
+        offset?: number;
+      }
+    ) => {
+      // Build filter object
+      const filter: any = {};
+      if (status) {
+        filter.status = status;
+      }
+      if (featured !== undefined) {
+        filter.featured = featured;
+      }
+
+      // Execute query with sorting, pagination
+      return await ProjectModel.find(filter)
+        .sort({ featured: -1, order: 1, startDate: -1 })
+        .limit(limit)
+        .skip(offset);
+    },
     project: async (_: unknown, { id }: { id: string }) => await ProjectModel.findById(id),
   },
   Mutation: {

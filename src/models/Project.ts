@@ -37,9 +37,18 @@ const projectSchema = new Schema<IProject>(
     order: { type: Number },
     featured: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+   }
 );
 
+// Ceci indique à Mongoose d'inclure les champs virtuels (comme notre 'id')
+// lorsqu'un document est converti en JSON pour être envoyé via l'API.
+projectSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
 // Index pour optimiser les requêtes fréquentes
 projectSchema.index({ status: 1, featured: -1, order: 1 });
 projectSchema.index({ startDate: -1 });
