@@ -13,7 +13,8 @@
     "prepare": "husky install",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "create-admin": "docker exec -it codefolio_api sh -c \"DOCKER_ENV=true MONGO_URI='mongodb://drissnafii:TheDendo2005@db:27017/codefolio?authSource=admin' ADMIN_EMAIL=${ADMIN_EMAIL:-admin@codefolio.com} ADMIN_USERNAME=${ADMIN_USERNAME:-admin} ADMIN_PASSWORD=${ADMIN_PASSWORD} npx tsx create-admin.ts\""
   },
   "keywords": [
     "graphql",
@@ -32,7 +33,6 @@
     "@types/cors": "^2.8.19",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.0",
     "graphql": "^16.11.0",
@@ -55,6 +55,7 @@
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "@vitest/coverage-v8": "4.0.5",
+    "dotenv": "^17.2.3",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^16.4.0",

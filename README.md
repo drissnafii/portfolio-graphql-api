@@ -61,6 +61,18 @@ Pour lancer ce projet en local, vous aurez besoin de Docker et de Docker Compose
     *   L'endpoint GraphQL est accessible à `http://localhost:4000/graphql`
     *   Vous pouvez interagir avec l'API via le Sandbox Apollo Studio directement dans votre navigateur.
 
+5.  **Créez l'utilisateur admin :**
+    Pour pouvoir vous connecter et accéder aux mutations protégées, créez un utilisateur admin :
+    ```bash
+    ./create-admin.sh "VotreMotDePasse123!"
+    ```
+    
+    Identifiants par défaut :
+    - Email : `admin@codefolio.com`
+    - Password : celui que vous avez défini dans la commande ci-dessus
+    
+    📚 Pour plus de détails, consultez [docs/admin-user-management.md](docs/admin-user-management.md)
+
 ---
 
 ## 🧪 Lancer les Tests
