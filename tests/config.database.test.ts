@@ -28,11 +28,22 @@ describe('config/database connectDB', () => {
 
   it('exits on connection error', async () => {
     process.env.MONGO_URI = 'mongodb://localhost:27017/fail';
-    vi.spyOn(mongoose, 'connect').mockRejectedValueOnce(new Error('boom'));
+    // Mock all retry attempts to fail immediately
+    vi.spyOn(mongoose, 'connect').mockRejectedValue(new Error('boom'));
     const exitSpy = vi.spyOn(process, 'exit').mockImplementationOnce((() => undefined) as any);
     const logSpy = vi.spyOn(logger, 'error').mockImplementation(() => logger as any);
-    await (dbModule as any).default();
+    
+    // Use fake timers to speed up the retry delays
+    vi.useFakeTimers();
+    const connectPromise = (dbModule as any).default();
+    
+    // Advance time to skip all retry delays (5 retries * 5000ms)
+    await vi.advanceTimersByTimeAsync(25000);
+    await connectPromise;
+    
+    vi.useRealTimers();
+    
     expect(exitSpy).toHaveBeenCalled();
     expect(logSpy).toHaveBeenCalled();
-  });
+  }, 10000);
 });

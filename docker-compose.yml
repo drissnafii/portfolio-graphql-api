@@ -12,11 +12,14 @@ services:
       - .:/app
       - /app/node_modules
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       MONGO_URI: mongodb://drissnafii:TheDendo2005@db:27017/codefolio?authSource=admin
       JWT_SECRET: ceci-est-un-secret-temporaire-a-changer-en-production
       CI: "true"
+    networks:
+      - codefolio_network
 
   db:
     image: mongo:8.0
@@ -29,6 +32,18 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - codefolio_network
+
+networks:
+  codefolio_network:
+    driver: bridge
 
 volumes:
   mongodb_data:
