@@ -29,9 +29,9 @@ describe('Auth middleware - getUserFromToken', () => {
 
   it('returns user for valid token', async () => {
     const u = await UserModel.create({ username: 'u1', email: 'u1@example.com', password: 'p@ss', role: 'admin' });
-    const token = jwt.sign({ id: u._id.toString(), role: 'admin' }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+    const token = jwt.sign({ id: (u._id as mongoose.Types.ObjectId).toString(), role: 'admin' }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
     const user = await getUserFromToken(`Bearer ${token}`);
-    expect(user?._id.toString()).toBe(u._id.toString());
+    expect((user as any)?._id.toString()).toBe((u._id as mongoose.Types.ObjectId).toString());
   });
 });
 
